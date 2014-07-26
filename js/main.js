@@ -36,12 +36,6 @@ var App = React.createClass({
     }.bind(this);
   },
 
-  onWeightChange: function () {
-    this.setState({
-      weight: Number(this.refs.range.getDOMNode().value)
-    })
-  },
-
   componentDidMount: function () {
     myWorker.addEventListener("message", function (e) {
       if (e.data.type == Type.Progress) {
@@ -78,21 +72,6 @@ var App = React.createClass({
   },
 
   render: function () {
-    var weightedAverage;
-    if (this.state.sort === 'weightedAverage') {
-      weightedAverage =
-        <div className="form-group">
-          <p>You can define what is more important to you: The number of coins required or the cost of coins.
-          Defaults to equally important (middle of slider).</p>
-          <input ref="range" id="weight" type="range" min="0" max="1" step="0.05" value={this.state.weight} onChange={this.onWeightChange} />
-          <p className="help-block">
-            <span className="pull-left">Number of coins</span>
-            <span className="pull-right">Cost of coins</span>
-          </p>
-          <div className="clearfix"/>
-        </div>;
-    }
-
     var table;
     if (this.state.solutions.length != 0) {
       var rows = this.state.solutions.map(function (solution, i) {
@@ -198,13 +177,6 @@ var App = React.createClass({
                   Minimize cost of coins
                   </label>
                 </div>
-                <div className="radio">
-                  <label>
-                    <input ref="weightedAverage" type="radio" name="optionsRadios" id="optionsRadios1" value="option1" onChange={this.createOnSortChange('weightedAverage')} checked={this.state.sort === 'weightedAverage'} />
-                  Minimize number of coins and cost of coins
-                  </label>
-                </div>
-              {weightedAverage}
               </div>
               {calculate}
             </form>
