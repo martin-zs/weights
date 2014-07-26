@@ -1,46 +1,218 @@
-function time(a) {
-  var now = new Date().getTime();
-  var result = a.call();
-  var millis = (new Date().getTime()) - now;
-  console.log(millis + " milliseconds");
-  return result;
+/** @jsx React.DOM */
+
+var myWorker = new Worker("js/worker.js");
+
+function numCoins(s) {
+  return s[0] + s[1] + s[2] + s[3] + s[4] + s[5] + s[6] + s[7];
 }
 
-function solutions(tw) {
-  var targetWeight = (tw * 10) || 1000;
+function costCoins(s) {
+  return s[0] * 2.0 + s[1] * 1.0 + s[2] + 0.5 + s[3] + 0.2 + s[4] + 0.1 + s[5] + 0.05 + s[6] + 0.02 + s[7] + 0.01;
+}
 
-  var res = [];
-  for (var a = 0; a < (targetWeight / 85); a++) {
-    for (var b = 0; b < (targetWeight / 75); b++) {
-      if (a * 85 + b * 75 <= targetWeight) {
-        for (var c = 0; c < (targetWeight / 78); c++) {
-          if (a * 85 + b * 75 + c * 78 <= targetWeight) {
-            for (var d = 0; d < (targetWeight / 57); d++) {
-              if (a * 85 + b * 75 + c * 78 + d * 57 <= targetWeight) {
-                for (var e = 0; e < (targetWeight / 41); e++) {
-                  if (a * 85 + b * 75 + c * 78 + d * 57 + e * 41 <= targetWeight) {
-                    for (var f = 0; f < (targetWeight / 39); f++) {
-                      if (a * 85 + b * 75 + c * 78 + d * 57 + e * 41 + f * 39 <= targetWeight) {
-                        for (var g = 0; g < (targetWeight / 30); g++) {
-                          if (a * 85 + b * 75 + c * 78 + d * 57 + e * 41 + f * 39 + g * 30 <= targetWeight) {
-                            for (var h = 0; h < (targetWeight / 23); h++) {
-                              if (a * 85 + b * 75 + c * 78 + d * 57 + e * 41 + f * 39 + g * 30 + h * 23 == targetWeight) {
-                                res.push([a, b, c, d, e, f, g, h])
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+var App = React.createClass({
+  getInitialState: function () {
+    return {
+      targetWeight: 100,
+      weight: 0.5,
+      sort: 'numCoins',
+      solutions: [],
+      loading: false,
+      init: true
     }
+  },
+
+  onTargetWeightChange: function () {
+    this.setState({
+      targetWeight: Number(this.refs.targetWeight.getDOMNode().value)
+    });
+  },
+
+  createOnSortChange: function (name) {
+    return function (e) {
+      this.setState({
+        sort: name
+      });
+    }.bind(this);
+  },
+
+  onWeightChange: function () {
+    this.setState({
+      weight: Number(this.refs.range.getDOMNode().value)
+    })
+  },
+
+  componentDidMount: function () {
+    myWorker.addEventListener("message", function (e) {
+      if (e.data.type == Type.Progress) {
+        this.setState({
+          solutions: e.data.solutions,
+          numSolutions: e.data.numSolutions
+        });
+      }
+      else if (e.data.type === Type.Result) {
+        this.setState({
+          loading: false,
+          solutions: e.data.solutions,
+          numSolutions: e.data.numSolutions
+        });
+      } else {
+        console.log(e.data)
+      }
+    }.bind(this), false);
+  },
+
+  calculate: function () {
+    this.setState({
+      numSolutions: 0,
+      solutions: [],
+      loading: true,
+      init: false
+    });
+
+    myWorker.postMessage({
+      targetWeight: this.state.targetWeight,
+      sort: this.state.sort,
+      weight: this.state.weight
+    });
+  },
+
+  render: function () {
+    var weightedAverage;
+    if (this.state.sort === 'weightedAverage') {
+      weightedAverage =
+        <div className="form-group">
+          <p>You can define what is more important to you: The number of coins required or the cost of coins.
+          Defaults to equally important (middle of slider).</p>
+          <input ref="range" id="weight" type="range" min="0" max="1" step="0.05" value={this.state.weight} onChange={this.onWeightChange} />
+          <p className="help-block">
+            <span className="pull-left">Number of coins</span>
+            <span className="pull-right">Cost of coins</span>
+          </p>
+          <div className="clearfix"/>
+        </div>;
+    }
+
+    var table;
+    if (this.state.solutions.length != 0) {
+      var rows = this.state.solutions.map(function (solution, i) {
+        return (
+          <tr key={'col-' + i}>
+            <td>{solution[0]}</td>
+            <td>{solution[1]}</td>
+            <td>{solution[2]}</td>
+            <td>{solution[3]}</td>
+            <td>{solution[4]}</td>
+            <td>{solution[5]}</td>
+            <td>{solution[6]}</td>
+            <td>{solution[7]}</td>
+            <td>{numCoins(solution)}</td>
+            <td>{'€ ' + costCoins(solution).toFixed(2)}</td>
+          </tr>
+          );
+      }, this);
+
+      table =
+        <div className="row">
+          <div className="col-md-8">
+            <h3>
+              {this.state.numSolutions} possibilities
+              {' '}
+              <small>Showing 100</small>
+            </h3>
+            <table className="table">
+              <thead>
+                <td>
+                  <strong>2 Euro</strong>
+                </td>
+                <td>
+                  <strong>1 Euro</strong>
+                </td>
+                <td>
+                  <strong>50 Cent</strong>
+                </td>
+                <td>
+                  <strong>20 Cent</strong>
+                </td>
+                <td>
+                  <strong>10 Cent</strong>
+                </td>
+                <td>
+                  <strong>5 Cent</strong>
+                </td>
+                <td>
+                  <strong>2 Cent</strong>
+                </td>
+                <td>
+                  <strong>1 Cent</strong>
+                </td>
+                <td>
+                  <strong>Number of Coins</strong>
+                </td>
+                <td>
+                  <strong>Cost of Coins</strong>
+                </td>
+              </thead>
+              <tbody>
+          {rows}
+              </tbody>
+            </table>
+          </div>
+        </div>;
+    }
+
+    var calculate;
+    if (!this.state.loading) {
+      calculate = <a className="btn btn-default" onClick={this.calculate}>Calculate</a>;
+    } else {
+      calculate = <a className="btn btn-default" disabled="disabled">Calculating...</a>;
+    }
+
+    return (
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-md-12">
+            <h1>How to make a {this.state.targetWeight}g calibration weight using Euro coins</h1>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-4">
+            <form role="form">
+              <div className="form-group">
+                <label htmlFor="targetWeight">Target Weight</label>
+                <div className="input-group">
+                  <input ref="targetWeight" type="number" className="form-control" id="targetWeight" value={this.state.targetWeight} onChange={this.onTargetWeightChange} min="0" placeholder="Target Weight"/>
+                  <div className="input-group-addon">g</div>
+                </div>
+              </div>
+              <div className="form-group">
+                <div className="radio">
+                  <label>
+                    <input ref="numCoins" type="radio" name="optionsRadios" id="optionsRadios1" value="option1" onChange={this.createOnSortChange('numCoins')} checked={this.state.sort === 'numCoins'} />
+                  Minimize number of coins
+                  </label>
+                </div>
+                <div className="radio">
+                  <label>
+                    <input ref="costCoins" type="radio" name="optionsRadios" id="optionsRadios1" value="option1" onChange={this.createOnSortChange('costCoins')} checked={this.state.sort === 'costCoins'} />
+                  Minimize cost of coins
+                  </label>
+                </div>
+                <div className="radio">
+                  <label>
+                    <input ref="weightedAverage" type="radio" name="optionsRadios" id="optionsRadios1" value="option1" onChange={this.createOnSortChange('weightedAverage')} checked={this.state.sort === 'weightedAverage'} />
+                  Minimize number of coins and cost of coins
+                  </label>
+                </div>
+              {weightedAverage}
+              </div>
+              {calculate}
+            </form>
+          </div>
+        </div>
+          {table}
+      </div>);
   }
-  
-  return res;
-}
+});
+
+React.renderComponent(<App/>, document.body);
