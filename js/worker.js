@@ -77,13 +77,13 @@ var minNum = PosInf, maxNum = NegInf,
 function updateMinMax(res) {
   for (var i = 0; i < res.length; i++) {
     var s = res[i];
-    
+
     var num = sortFuncs.numCoins(s);
     var cost = sortFuncs.costCoins(s);
-    
+
     if (num < minNum) minNum = num;
     else if (num > maxNum) maxNum = num;
-    
+
     if (cost < minCost) minCost = cost;
     else if (cost > maxCost) maxCost = cost;
   }
@@ -96,7 +96,7 @@ self.addEventListener('message', function (e) {
   var sortFunc = sortFuncs[e.data.sort];
   if (e.data.sort === 'weightedAverage') {
     sortFunc = function (s) {
-      
+
     };
   }
 

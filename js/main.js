@@ -101,39 +101,19 @@ var App = React.createClass({
             </h3>
             <table className="table">
               <thead>
-                <td>
-                  <strong>2 Euro</strong>
-                </td>
-                <td>
-                  <strong>1 Euro</strong>
-                </td>
-                <td>
-                  <strong>50 Cent</strong>
-                </td>
-                <td>
-                  <strong>20 Cent</strong>
-                </td>
-                <td>
-                  <strong>10 Cent</strong>
-                </td>
-                <td>
-                  <strong>5 Cent</strong>
-                </td>
-                <td>
-                  <strong>2 Cent</strong>
-                </td>
-                <td>
-                  <strong>1 Cent</strong>
-                </td>
-                <td>
-                  <strong>Number of Coins</strong>
-                </td>
-                <td>
-                  <strong>Cost of Coins</strong>
-                </td>
+                <td><strong>2 Euro</strong></td>
+                <td><strong>1 Euro</strong></td>
+                <td><strong>50 Cent</strong></td>
+                <td><strong>20 Cent</strong></td>
+                <td><strong>10 Cent</strong></td>
+                <td><strong>5 Cent</strong></td>
+                <td><strong>2 Cent</strong></td>
+                <td><strong>1 Cent</strong></td>
+                <td><strong>Number of Coins</strong></td>
+                <td><strong>Cost of Coins</strong></td>
               </thead>
               <tbody>
-          {rows}
+                {rows}
               </tbody>
             </table>
           </div>
@@ -150,8 +130,39 @@ var App = React.createClass({
     return (
       <div className="container-fluid">
         <div className="row">
-          <div className="col-md-12">
-            <h1>How to make a {this.state.targetWeight}g calibration weight using Euro coins</h1>
+          <div className="col-md-8">
+            <h1>How to make a {this.state.targetWeight}g calibration weight using only Euro coins</h1>
+            <p>
+              Precision scales require that you calibrate them using a calibration weight (typically 100g) before using them for the first time.<br/>
+              Since coins have standardized weights, you can combine them to create almost every weight you want.
+            </p>
+            <table className="table">
+              <thead>
+                <td><strong>2 Euro</strong></td>
+                <td><strong>1 Euro</strong></td>
+                <td><strong>50 Cent</strong></td>
+                <td><strong>20 Cent</strong></td>
+                <td><strong>10 Cent</strong></td>
+                <td><strong>5 Cent</strong></td>
+                <td><strong>2 Cent</strong></td>
+                <td><strong>1 Cent</strong></td>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>8.5g</td>
+                  <td>7.5g</td>
+                  <td>7.8g</td>
+                  <td>5.7g</td>
+                  <td>4.1g</td>
+                  <td>3.9g</td>
+                  <td>3.0g</td>
+                  <td>2.3g</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              Use the tool below to find valid combinations:
+            </p>
           </div>
         </div>
         <div className="row">
@@ -160,21 +171,46 @@ var App = React.createClass({
               <div className="form-group">
                 <label htmlFor="targetWeight">Target Weight</label>
                 <div className="input-group">
-                  <input ref="targetWeight" type="number" className="form-control" id="targetWeight" value={this.state.targetWeight} onChange={this.onTargetWeightChange} min="0" placeholder="Target Weight"/>
+                  <input
+                    id="targetWeight"
+                    ref="targetWeight"
+                    className="form-control"
+                    type="number"
+                    placeholder="Target Weight"
+                    min="0"
+                    value={this.state.targetWeight}
+                    onChange={this.onTargetWeightChange}
+                  />
                   <div className="input-group-addon">g</div>
                 </div>
               </div>
               <div className="form-group">
                 <div className="radio">
                   <label>
-                    <input ref="numCoins" type="radio" name="optionsRadios" id="optionsRadios1" value="option1" onChange={this.createOnSortChange('numCoins')} checked={this.state.sort === 'numCoins'} />
-                  Minimize number of coins
+                    <input
+                      id="optionsRadios1"
+                      ref="numCoins"
+                      type="radio"
+                      name="optionsRadios"
+                      value="option1"
+                      onChange={this.createOnSortChange('numCoins')}
+                      checked={this.state.sort === 'numCoins'}
+                    />
+                      Minimize number of coins
                   </label>
                 </div>
                 <div className="radio">
                   <label>
-                    <input ref="costCoins" type="radio" name="optionsRadios" id="optionsRadios1" value="option1" onChange={this.createOnSortChange('costCoins')} checked={this.state.sort === 'costCoins'} />
-                  Minimize cost of coins
+                    <input
+                      id="optionsRadios1"
+                      ref="costCoins"
+                      type="radio"
+                      name="optionsRadios"
+                      value="option1"
+                      onChange={this.createOnSortChange('costCoins')}
+                      checked={this.state.sort === 'costCoins'}
+                    />
+                      Minimize cost of coins
                   </label>
                 </div>
               </div>
@@ -182,7 +218,13 @@ var App = React.createClass({
             </form>
           </div>
         </div>
-          {table}
+        {table}
+        <div className="row">
+          <hr/>
+          <div className="col-md-4">
+            <small>Made by <a href="https://qwtel.com/">@qwtel</a>.</small>
+          </div>
+        </div>
       </div>);
   }
 });
