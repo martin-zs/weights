@@ -7,7 +7,7 @@ function numCoins(s) {
 }
 
 function costCoins(s) {
-  return s[0] * 2.0 + s[1] * 1.0 + s[2] + 0.5 + s[3] + 0.2 + s[4] + 0.1 + s[5] + 0.05 + s[6] + 0.02 + s[7] + 0.01;
+  return s[0] * 2.0 + s[1] * 1.0 + s[2] * 0.5 + s[3] * 0.2 + s[4] * 0.1 + s[5] * 0.05 + s[6] * 0.02 + s[7] * 0.01;
 }
 
 var App = React.createClass({
